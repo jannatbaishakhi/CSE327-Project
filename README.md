@@ -73,8 +73,7 @@ SplitWise+ is a full-stack collaborative financial workspace for groups that sha
 | Frontend | React 19, TypeScript, Vite, Lucide React |
 | Backend | Django 5, Django REST Framework, Django Channels, Daphne |
 | Auth | `djangorestframework-simplejwt` + session-aware JWT middleware |
-| Realtime | WebSocket consumers (group + direct) via Django Channels; frontend uses polling fallback |
-| Database | SQLite (dev) / PostgreSQL via `DATABASE_URL` (production) |
+| Database | SQLite |
 | Storage | Django `default_storage` for avatars, receipts, and chat attachments |
 
 
