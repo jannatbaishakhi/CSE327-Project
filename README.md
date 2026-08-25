@@ -77,80 +77,6 @@ SplitWise+ is a full-stack collaborative financial workspace for groups that sha
 | Database | SQLite (dev) / PostgreSQL via `DATABASE_URL` (production) |
 | Storage | Django `default_storage` for avatars, receipts, and chat attachments |
 
----
-
-## Repository structure
-
-```
-split/
-├── frontend/
-│   ├── src/
-│   │   ├── App.tsx                   # root orchestration — state, effects, routing
-│   │   ├── main.tsx
-│   │   ├── styles.css                # liquid-glass design system
-│   │   ├── components/
-│   │   │   ├── AccountMenu.tsx
-│   │   │   ├── AnnouncementBanner.tsx
-│   │   │   ├── AuthModal.tsx
-│   │   │   ├── Avatar.tsx
-│   │   │   ├── CommandPalette.tsx
-│   │   │   ├── ExpenseDetailModal.tsx
-│   │   │   ├── ExpenseModal.tsx
-│   │   │   ├── GroupCreateModal.tsx
-│   │   │   ├── InviteModal.tsx
-│   │   │   ├── NavButton.tsx
-│   │   │   ├── Notifications.tsx
-│   │   │   ├── Pagination.tsx
-│   │   │   ├── PaymentModal.tsx
-│   │   │   ├── ProfileDrawer.tsx
-│   │   │   ├── Sidebar.tsx
-│   │   │   └── Topbar.tsx
-│   │   ├── pages/
-│   │   │   ├── ActivityPage.tsx
-│   │   │   ├── BudgetsPage.tsx
-│   │   │   ├── ChatPage.tsx
-│   │   │   ├── ConnectedFeaturePanel.tsx
-│   │   │   ├── DashboardPage.tsx
-│   │   │   ├── DocumentsPage.tsx
-│   │   │   ├── ExpensesPage.tsx
-│   │   │   ├── Landing.tsx
-│   │   │   ├── OverviewPage.tsx
-│   │   │   ├── PlanPage.tsx
-│   │   │   ├── RecurringPage.tsx
-│   │   │   ├── SettingsPage.tsx
-│   │   │   └── SettlePage.tsx
-│   │   ├── lib/
-│   │   │   ├── api.ts                # REST client, token refresh, WS helpers
-│   │   │   └── usePagination.ts      # generic client-side pagination hook
-│   │   ├── data/
-│   │   │   └── demoData.ts           # demo members, money helper, normalizeMessage
-│   │   └── types/
-│   │       └── index.ts              # shared TypeScript interfaces
-│   └── package.json
-├── backend/
-│   ├── apps/
-│   │   ├── core/
-│   │   │   ├── models.py             # all domain models
-│   │   │   ├── api.py                # all viewsets and serializers
-│   │   │   ├── consumers.py          # WebSocket consumers (group + direct)
-│   │   │   ├── chat.py               # WS broadcast helpers, reaction logic
-│   │   │   ├── auth.py               # register, login, session management
-│   │   │   ├── urls.py               # DRF router registrations
-│   │   │   ├── routing.py            # WebSocket URL patterns
-│   │   │   └── management/commands/seed_demo.py
-│   │   ├── accounts/                 # auth domain facade
-│   │   ├── groups/                   # group domain facade
-│   │   ├── finance/                  # expense/settlement domain facade
-│   │   ├── messaging/                # chat domain facade
-│   │   └── planning/                 # planning domain facade
-│   ├── config/
-│   │   ├── settings.py
-│   │   ├── urls.py
-│   │   ├── asgi.py                   # Channels + JWT WS middleware
-│   │   └── jwt_websocket.py          # token-in-query-string WS auth
-│   └── requirements.txt
-└── docs/
-```
 
 ---
 
@@ -160,9 +86,8 @@ split/
 
 ```bash
 cd frontend
-pnpm install        # or: npm install
-pnpm run dev        # starts Vite dev server at http://localhost:5173
-pnpm run build      # production build
+pnpm install        
+pnpm run dev        
 ```
 
 The frontend works standalone in demo mode — no backend required to explore the UI.
@@ -171,72 +96,16 @@ The frontend works standalone in demo mode — no backend required to explore th
 
 ```bash
 cd backend
-python -m venv .venv
-# Windows:
-.venv\Scripts\activate
-# macOS/Linux:
-source .venv/bin/activate
-
 pip install -r requirements.txt
 python manage.py migrate
-python manage.py seed_demo        # creates 5 users, 3 groups, sample expenses
-python manage.py runserver        # or: daphne config.asgi:application
+python manage.py seed_demo        
+python manage.py runserver     
 ```
 
-Set `DATABASE_URL` to a PostgreSQL connection string in production.  
-Set `DJANGO_SECRET_KEY`, `DJANGO_ALLOWED_HOSTS`, and `DJANGO_DEBUG` via environment variables.
 
-### Environment variables (optional)
+## Demo accounts
 
-| Variable | Default | Purpose |
-|---|---|---|
-| `VITE_API_BASE_URL` | `http://localhost:8000/api/v1` | Backend REST base URL |
-| `VITE_WS_BASE_URL` | derived from API URL | WebSocket base URL |
-| `DJANGO_SECRET_KEY` | dev placeholder | Must be set in production |
-| `DJANGO_DEBUG` | `1` | Set to `0` in production |
-| `DJANGO_ALLOWED_HOSTS` | `localhost,127.0.0.1` | Comma-separated allowed hosts |
-| `DATABASE_URL` | SQLite | PostgreSQL connection string |
 
----
+Username: rafi
+Password: splitwise-demo-123
 
-## Seeded demo accounts
-
-All accounts share the same password.
-
-| Username | Name | Role |
-|---|---|---|
-| `rafi` | Rafi Hasan | Owner of Dhaka trip & Dhanmondi 3B |
-| `tisha` | Tisha Rahman | Owner of Studio adda |
-| `nabil` | Nabil Karim | Member |
-| `mahi` | Mahi Sultana | Member |
-| `shuvo` | Shuvo Ahmed | Member |
-
-**Password:** `splitwise-demo-123`
-
----
-
-## API overview
-
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/api/v1/auth/register/` | Create account |
-| POST | `/api/v1/auth/token/` | Sign in, get JWT |
-| POST | `/api/v1/auth/token/refresh/` | Refresh access token |
-| GET | `/api/v1/auth/me/` | Current user |
-| GET | `/api/v1/auth/me/dashboard/` | Personal financial summary |
-| GET/POST | `/api/v1/groups/` | List or create groups |
-| GET | `/api/v1/groups/{id}/settlement_plan/` | Optimized transfer plan |
-| GET/POST | `/api/v1/expenses/` | Group expenses (`?group=`) |
-| GET/POST | `/api/v1/settlements/` | Settlement requests |
-| POST | `/api/v1/settlements/{id}/pay/` | Simulate payment |
-| GET/POST | `/api/v1/messages/` | Chat history (`?group=` or `?recipient=`) |
-| POST | `/api/v1/messages/upload/` | Upload chat attachment |
-| GET/POST | `/api/v1/budgets/` | Group budgets |
-| GET/POST | `/api/v1/polls/` | Group polls |
-| GET/POST | `/api/v1/events/` | Group events |
-| GET/POST | `/api/v1/recurring-expenses/` | Recurring expenses |
-| GET | `/api/v1/notifications/` | Account notifications |
-| GET/POST | `/api/v1/invitations/` | Group invitations |
-| GET/PATCH | `/api/v1/profiles/me/` | Profile and avatar |
-| WS | `ws://host/ws/groups/{id}/chat/` | Group chat socket |
-| WS | `ws://host/ws/users/{id}/chat/` | Direct message socket |
